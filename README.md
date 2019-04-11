@@ -10,9 +10,6 @@ Supervisor.
 
 ## Installation Methods
 
-- [Chef Cookbook][2]
-- [Package managers][3]
-- [Docker][4] (unavailable)
 - [Manuel Instructions](#manuel-instructions)
 
 ## Manuel Instructions
