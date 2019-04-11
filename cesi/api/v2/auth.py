@@ -29,6 +29,7 @@ def login():
                     ),
             400,
             )
+    user_credentials["username"] += "@" + current_app.config["LDAP_DOMAIN"]
     ldap_test = None
     try:
         ldap_test = ldap.bind_user(user_credentials["username"], user_credentials["password"])
@@ -45,7 +46,7 @@ def login():
                 session["username"] = user_credentials["username"]
                 session["logged_in"] = True
                 session["ldap_login"] = True
-                activity.logger.info("{} logged in through LDAP".format(session["username"]))
+                activity.logger.info("{} logged in".format(session["username"]))
                 return jsonify(status="success", message="Valid username/password")
             else:
                 return jsonify(status="error", message="User doesn't have permission"), 403
