@@ -37,7 +37,7 @@ $ mkdir ${CESI_SETUP_PATH}
 $ cd ${CESI_SETUP_PATH}
 
 $ # Download the project to ~/cesi directory
-$ git clone https://github.com/zhenialeks/cedi_ldap_auth.git
+$ git clone https://github.com/zhenialeks/cesi_ldap_auth.git
 
 $ # Create virtual environment and install requirement packages
 $ python3 -m venv venv
