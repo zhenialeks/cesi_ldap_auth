@@ -8,12 +8,12 @@ from models import User
 users = Blueprint("users", __name__)
 activity = ActivityLog.getInstance()
 
+# TODO:decide, what to do with users' view
+
 
 @users.route("/", methods=["GET"])
 @is_user_logged_in("Illegal request for display users event.")
-@is_admin(
-    "Unauthorized user request for display users event. Display users event fail."
-)
+# @is_admin("Unauthorized user request for display users event. Display users event fail.")
 def user_list():
     users = controllers.get_users()
     return jsonify(status="success", users=users)
@@ -21,7 +21,7 @@ def user_list():
 
 @users.route("/", methods=["POST"])
 @is_user_logged_in("Illegal request for add user event.")
-@is_admin("Unauthorized user for request to add user event. Add user event fail.")
+# @is_admin("Unauthorized user for request to add user event. Add user event fail.")
 def add_new_user():
     data = request.get_json()
     new_user = {}
@@ -83,7 +83,7 @@ def add_new_user():
 
 @users.route("/<username>/", methods=["DELETE"])
 @is_user_logged_in("Illegal request for delete {username} user event.")
-@is_admin("Unauthorized user for request to delete {username} user. Delete event fail.")
+# @is_admin("Unauthorized user for request to delete {username} user. Delete event fail.")
 def delete_user(username):
     if username == "admin":
         activity.logger.error(

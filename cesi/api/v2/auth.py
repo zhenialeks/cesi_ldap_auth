@@ -1,8 +1,8 @@
-from flask import Blueprint, jsonify, session, request, g
+from flask import Blueprint, jsonify, session, request, g, current_app
 
 from decorators import is_user_logged_in, is_admin
 from loggers import ActivityLog
-from models import User
+# from models import User
 from extensions import ldap
 
 auth = Blueprint("auth", __name__)
@@ -24,39 +24,35 @@ def login():
 
     if invalid_fields:
         return (
-            jsonify(
-                status="error",
-                message="Please enter valid value for '{}' fields".format(
-                    ",".join(invalid_fields)
-                ),
-            ),
+            jsonify(status="error", message="Please enter valid value for '{}' fields"
+                    .format(",".join(invalid_fields)),
+                    ),
             400,
-        )
-    test = None
+            )
+    ldap_test = None
     try:
-        test = ldap.bind_user(user_credentials["username"], user_credentials["password"])
+        ldap_test = ldap.bind_user(user_credentials["username"], user_credentials["password"])
     except Exception as e:
         activity.logger.info("LDAP exception[{}]".format(e))
-        print("An error with ldap-bind-user occured:{}".format(e))
+        print("During ldap.bind_user call an exception has occurred:{}".format(e))
 
-    if test is None or user_credentials["password"] == "":
+    if ldap_test is not None:
+        if user_credentials["password"] != "":
+            session["groups"] = ldap.get_user_groups(user=user_credentials["username"])
 
-        result = User.verify(user_credentials["username"], user_credentials["password"])
-        if not result:
-            session.clear()
-            return jsonify(status="error", message="Invalid username/password"), 403
-
-        session["username"] = user_credentials["username"]
-        session["logged_in"] = True
-        activity.logger.info("{} logged in.".format(session["username"]))
-        return jsonify(status="success", message="Valid username/password")
-
+            if session["groups"] and current_app.config['LDAP_ACCEPT_GROUP'] in session["groups"]:
+                # success
+                session["username"] = user_credentials["username"]
+                session["logged_in"] = True
+                session["ldap_login"] = True
+                activity.logger.info("{} logged in through LDAP".format(session["username"]))
+                return jsonify(status="success", message="Valid username/password")
+            else:
+                return jsonify(status="error", message="User doesn't have permission"), 403
+        else:
+            return jsonify(status="error", message="Accounts with empty password are not allowed to log in"), 403
     else:
-        session["username"] = user_credentials["username"]
-        activity.logger.info("{} LDAP logged in".format(session["username"]))
-        session["logged_in"] = True
-        session["ldap_login"] = True
-        return jsonify(status="success", message="Valid username/password")
+        return jsonify(status="error", message="Invalid username/password"), 403
 
 
 @auth.route("/logout/", methods=["POST"])
@@ -65,6 +61,6 @@ def logout():
     if username is None:
         return jsonify(status="error", message="You haven't already entered"), 403
 
-    activity.logger.error("{} logged out".format(username))
+    activity.logger.info("{} logged out".format(username))
     session.clear()
     return jsonify(status="success", message="Logout")

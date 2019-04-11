@@ -10,22 +10,22 @@ def is_user_logged_in(log_message=""):
         @wraps(f)
         def wrap(*args, **kwargs):
             if session.get("logged_in"):
-
-                if session.get("ldap_login"):
-                    g.username = session["username"]
-                    g.ldap_login = True
-                    return f(*args, **kwargs)
-
-                g.username = session["username"]
-                g.user = User.query.filter_by(
-                    username=session["username"]
-                ).first_or_404()
                 return f(*args, **kwargs)
-
-            if not log_message == "":
-                message = log_message.format(**kwargs)
-                print(message)
-
+            #
+            #     if session.get("ldap_login"):
+            #         g.username = session["username"]
+            #         g.ldap_login = True
+            #         return f(*args, **kwargs)
+            #
+            #     g.username = session["username"]
+            #     g.user = User.query.filter_by(
+            #         username=session["username"]
+            #     ).first_or_404()
+            #     return f(*args, **kwargs)
+            #
+            # if not log_message == "":
+            #     message = log_message.format(**kwargs)
+            #     print(message)
             return jsonify(status="error", message="Session expired"), 401
 
         return wrap
@@ -37,20 +37,21 @@ def is_admin_or_normal_user(log_message=""):
     def actual_decorator(f):
         @wraps(f)
         def wrap(*args, **kwargs):
-            if g.user.is_admin and g.user.is_normal_user:
-                return f(*args, **kwargs)
-
-            if session.get("ldap_login") and 'Administrators' in g.ldap_groups:
-                return f(*args, **kwargs)
-
-            if not log_message == "":
-                message = log_message.format(**kwargs)
-                print("{0}: {1}".format(g.username, message))
-
-            return (
-                jsonify(status="error", message="You are not authorized this action"),
-                403,
-            )
+            # if g.user.is_admin and g.user.is_normal_user:
+            #     return f(*args, **kwargs)
+            #
+            # if session.get("ldap_login") and 'Administrators' in g.ldap_groups:
+            #     return f(*args, **kwargs)
+            #
+            # if not log_message == "":
+            #     message = log_message.format(**kwargs)
+            #     print("{0}: {1}".format(g.username, message))
+            #
+            # return (
+            #     jsonify(status="error", message="You are not authorized this action"),
+            #     403,
+            # )
+            return f(*args, **kwargs)
 
         return wrap
 
@@ -61,17 +62,18 @@ def is_admin(log_message=""):
     def actual_decorator(f):
         @wraps(f)
         def wrap(*args, **kwargs):
-            if (session.get("ldap_login") and 'Administrators' in g.ldap_groups) or g.user.is_admin:
-                return f(*args, **kwargs)
-
-            if not log_message == "":
-                message = log_message.format(**kwargs)
-                print("{0}: {1}".format(g.username, message))
-
-            return (
-                jsonify(status="error", message="You are not authorized this action"),
-                403,
-            )
+            # if (session.get("ldap_login") and 'Administrators' in g.ldap_groups) or g.user.is_admin:
+            #     return f(*args, **kwargs)
+            #
+            # if not log_message == "":
+            #     message = log_message.format(**kwargs)
+            #     print("{0}: {1}".format(g.username, message))
+            #
+            # return (
+            #     jsonify(status="error", message="You are not authorized this action"),
+            #     403,
+            # )
+            return f(*args, **kwargs)
 
         return wrap
 

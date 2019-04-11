@@ -16,7 +16,7 @@ db = SQLAlchemy()
 def register_extensions(app):
     ldap.init_app(app)
 
-
+# what for?
 def register_hooks(app):
     @app.before_request
     def before_request():
@@ -38,10 +38,11 @@ def create_app(cesi):
     app.config["SQLALCHEMY_DATABASE_URI"] = cesi.database
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-    app.config['LDAP_HOST'] = '192.168.56.106'
-    app.config['LDAP_BASE_DN'] = 'CN=admin,CN=Users,dc=robot,dc=local'
-    app.config['LDAP_USERNAME'] = 'admin@robot.local'
-    app.config['LDAP_PASSWORD'] = 'blaBLA778'
+    app.config['LDAP_HOST'] = '192.168.56.6'
+    app.config['LDAP_BASE_DN'] = 'CN=Users,dc=robot,dc=local'
+    app.config['LDAP_USERNAME'] = 'ironman@robot.local'
+    app.config['LDAP_PASSWORD'] = 'ironTEA31415'
+    app.config["LDAP_ACCEPT_GROUP"] = "Administrators"
     # app.config['LDAP_CUSTOM_OPTIONS'] = {ldap.OPT_REFERRALS: 0}
 
 
