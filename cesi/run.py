@@ -4,12 +4,26 @@ import signal
 import os
 import importlib
 
-from flask import Flask, render_template, jsonify, g
+from flask import Flask, render_template, jsonify, g, session
 from flask_sqlalchemy import SQLAlchemy
+from extensions import ldap
 
 from version import __version__
 
 db = SQLAlchemy()
+
+
+def register_extensions(app):
+    ldap.init_app(app)
+
+
+def register_hooks(app):
+    @app.before_request
+    def before_request():
+        g.user = None
+        if 'user_id' in session:
+            g.user = {}
+            g.ldap_groups = ldap.get_user_groups(user=session["user_id"])
 
 
 def create_app(cesi):
@@ -23,6 +37,14 @@ def create_app(cesi):
     )
     app.config["SQLALCHEMY_DATABASE_URI"] = cesi.database
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+    app.config['LDAP_HOST'] = '192.168.56.106'
+    app.config['LDAP_BASE_DN'] = 'CN=admin,CN=Users,dc=robot,dc=local'
+    app.config['LDAP_USERNAME'] = 'admin@robot.local'
+    app.config['LDAP_PASSWORD'] = 'blaBLA778'
+    # app.config['LDAP_CUSTOM_OPTIONS'] = {ldap.OPT_REFERRALS: 0}
+
+
     app.secret_key = os.urandom(24)
 
     db.init_app(app)
@@ -39,7 +61,9 @@ def create_app(cesi):
     def _(error):
         return jsonify(status="error", message=error.description), error.code
 
+    register_hooks(app)
     register_blueprints(app)
+    register_extensions(app)
 
     return app
 
@@ -58,7 +82,7 @@ def configure(config_file_path):
     with app.app_context():
         check_database()
 
-    signal.signal(signal.SIGHUP, lambda signum, frame: cesi.reload())
+    # signal.signal(signal.SIGHUP, lambda signum, frame: cesi.reload())
 
     return app, cesi
 

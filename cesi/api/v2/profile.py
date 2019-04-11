@@ -12,6 +12,13 @@ activity = ActivityLog.getInstance()
 @profile.route("/", methods=["GET"])
 @is_user_logged_in("Illegal request to get your own information")
 def get_own_info():
+    if g.ldap_login:
+        #TODO: change this thing
+        return jsonify(status="success", user={
+            "username": g.username,
+            "password": "",
+            "usertype:": "ldap"
+        })
     user = controllers.get_user(g.user.username)
     print(user)
     return jsonify(status="success", user=user)

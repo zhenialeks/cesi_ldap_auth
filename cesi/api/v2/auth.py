@@ -3,6 +3,7 @@ from flask import Blueprint, jsonify, session, request, g
 from decorators import is_user_logged_in, is_admin
 from loggers import ActivityLog
 from models import User
+from extensions import ldap
 
 auth = Blueprint("auth", __name__)
 activity = ActivityLog.getInstance()
@@ -31,16 +32,31 @@ def login():
             ),
             400,
         )
+    test = None
+    try:
+        test = ldap.bind_user(user_credentials["username"], user_credentials["password"])
+    except Exception as e:
+        activity.logger.info("LDAP exception[{}]".format(e))
+        print("An error with ldap-bind-user occured:{}".format(e))
 
-    result = User.verify(user_credentials["username"], user_credentials["password"])
-    if not result:
-        session.clear()
-        return jsonify(status="error", message="Invalid username/password"), 403
+    if test is None or user_credentials["password"] == "":
 
-    session["username"] = user_credentials["username"]
-    session["logged_in"] = True
-    activity.logger.info("{} logged in.".format(session["username"]))
-    return jsonify(status="success", message="Valid username/password")
+        result = User.verify(user_credentials["username"], user_credentials["password"])
+        if not result:
+            session.clear()
+            return jsonify(status="error", message="Invalid username/password"), 403
+
+        session["username"] = user_credentials["username"]
+        session["logged_in"] = True
+        activity.logger.info("{} logged in.".format(session["username"]))
+        return jsonify(status="success", message="Valid username/password")
+
+    else:
+        session["username"] = user_credentials["username"]
+        activity.logger.info("{} LDAP logged in".format(session["username"]))
+        session["logged_in"] = True
+        session["ldap_login"] = True
+        return jsonify(status="success", message="Valid username/password")
 
 
 @auth.route("/logout/", methods=["POST"])

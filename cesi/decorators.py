@@ -10,6 +10,12 @@ def is_user_logged_in(log_message=""):
         @wraps(f)
         def wrap(*args, **kwargs):
             if session.get("logged_in"):
+
+                if session.get("ldap_login"):
+                    g.username = session["username"]
+                    g.ldap_login = True
+                    return f(*args, **kwargs)
+
                 g.username = session["username"]
                 g.user = User.query.filter_by(
                     username=session["username"]
@@ -34,6 +40,9 @@ def is_admin_or_normal_user(log_message=""):
             if g.user.is_admin and g.user.is_normal_user:
                 return f(*args, **kwargs)
 
+            if session.get("ldap_login") and 'Administrators' in g.ldap_groups:
+                return f(*args, **kwargs)
+
             if not log_message == "":
                 message = log_message.format(**kwargs)
                 print("{0}: {1}".format(g.username, message))
@@ -52,7 +61,7 @@ def is_admin(log_message=""):
     def actual_decorator(f):
         @wraps(f)
         def wrap(*args, **kwargs):
-            if g.user.is_admin:
+            if (session.get("ldap_login") and 'Administrators' in g.ldap_groups) or g.user.is_admin:
                 return f(*args, **kwargs)
 
             if not log_message == "":

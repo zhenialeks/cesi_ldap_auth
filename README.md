@@ -97,20 +97,11 @@ Please change password after first login!
 - **Password:** admin
 
 ## TODO
-
-- [x] Fix user related api endpoints
-- [ ] Fix node log view
-- [x] Refactor the usage of config
-- [ ] Rewrite dockerfile and publish image on docker hub under gamegos
-- [ ] Improve Docs
-- [x] Do not use external adresses for javascript and css libraries
-- [ ] Use a logging lib
-- [ ] Better format for activity logs (tabbed date, level, component, message)
-- [ ] Auto refresh page
-- [ ] Option to select different templates
-- [x] Upgrade flask
-- [ ] Add tests
-- [ ] CI integration
+- [ ] Check passwords with special characters
+- [ ] Refactor some places (like, remove decorators)
+- [ ] Disable "change password" option in UI
+- [ ] Test LDAP-login
+- [ ] Separate app's config and ldap's config
 
 [1]: http://supervisord.org/
 [2]: https://github.com/gamegos/cesi-cookbook/

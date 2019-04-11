@@ -1,6 +1,7 @@
 import importlib
 
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, session
+from extensions import ldap
 
 API_VERSION = "v2"
 API_PREFIX = "/api/{}".format(API_VERSION)
