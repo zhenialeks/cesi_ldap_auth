@@ -38,12 +38,12 @@ def create_app(cesi):
     app.config["SQLALCHEMY_DATABASE_URI"] = cesi.database
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-    app.config['LDAP_HOST'] = '192.168.56.6'
-    app.config['LDAP_BASE_DN'] = 'CN=Users,dc=robot,dc=local'
-    app.config['LDAP_USERNAME'] = 'ironman'
-    app.config['LDAP_PASSWORD'] = 'ironTEA31415'
-    app.config["LDAP_ACCEPT_GROUP"] = "Administrators"
-    app.config["LDAP_DOMAIN"] = "robot.local"
+    app.config['LDAP_HOST'] = cesi.ldap_host
+    app.config['LDAP_BASE_DN'] = cesi.ldap_base_dn
+    app.config['LDAP_USERNAME'] = cesi.ldap_username
+    app.config['LDAP_PASSWORD'] = cesi.ldap_password
+    app.config["LDAP_ACCEPT_GROUP"] = cesi.ldap_accept_group
+    app.config["LDAP_DOMAIN"] = cesi.ldap_domain
     # app.config['LDAP_CUSTOM_OPTIONS'] = {ldap.OPT_REFERRALS: 0}
 
     app.secret_key = os.urandom(24)

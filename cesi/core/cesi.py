@@ -45,6 +45,15 @@ class Cesi:
         self.node_names = result["node_names"]
         self.node_environments = result["node_environments"]
         self.nodes = result["nodes"]
+
+        # LDAP config loading:
+        self.ldap_host = result["ldap_host"]
+        self.ldap_base_dn = result["ldap_base_dn"]
+        self.ldap_username = result["ldap_usename"]
+        self.ldap_password = result["ldap_password"]
+        self.ldap_accept_group = result["ldap_accept_group"]
+        self.ldap_domain = result["ldap_domain"]
+
         print(result)
 
     def reload(self):

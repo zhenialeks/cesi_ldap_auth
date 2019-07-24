@@ -13,6 +13,14 @@ activity_log = "activity.log"   # File path for CeSI logs
 admin_username = "admin"        # Username of admin user
 admin_password = "admin"        # Password of admin user
 
+# LDAP configuration
+ldap_host = "192.168.56.6"
+ldap_base_dn = "CN=Users,dc=robot,dc=local"
+ldap_username = "ironman"
+ldap_password = "ironTEA31415"
+ldap_accept_group = "Administrators"
+ldap_domain = "robot.local"
+
 # This is the definition section for new supervisord node.
 # [[nodes]]
 # name = "api"          # (String) Unique name for supervisord node.
